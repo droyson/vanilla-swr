@@ -1,0 +1,1 @@
+(()=>{"use strict";var e,o={306:(e,o)=>{Object.defineProperty(o,"__esModule",{value:!0}),o.A=void 0,o.A="mainA",console.log("file mainA called")}},r={};e=function e(l){var t=r[l];if(void 0!==t)return t.exports;var i=r[l]={exports:{}};return o[l](i,i.exports,e),i.exports}(306),console.log("index called with A value",e.A)})();

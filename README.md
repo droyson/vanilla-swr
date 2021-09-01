@@ -1,2 +1,2 @@
-# js-library-boilerplate
-Boilerplate code for setting up a JS library
+# Vanilla SWR
+`stale-while-revalidate` caching strategy for vanilla web-apps 

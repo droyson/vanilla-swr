@@ -21,7 +21,7 @@ module.exports = {
   },
   plugins: [
     new DeclarationBundlerPlugin({
-      moduleName: 'lib',
+      moduleName: 'swr',
       out: './types/index.d.ts'
     })
   ]

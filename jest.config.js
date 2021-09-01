@@ -4,7 +4,7 @@ module.exports = {
   testEnvironment: 'node',
   globals: {
     "ts-jest": {
-      tsconfig: 'tsconfig.json'
+      tsconfig: 'tsconfig.test.json'
     }
   },
   collectCoverage: true,

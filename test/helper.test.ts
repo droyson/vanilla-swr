@@ -24,7 +24,6 @@ describe('helper', function () {
 
     test('should return false when paramter is string or null or undefined', () => {
       expect(isFunction('key')).toBeFalsy()
-      expect(isFunction(null)).toBeFalsy()
       expect(isFunction([])).toBeFalsy()
     })
   })

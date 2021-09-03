@@ -1,7 +1,7 @@
 
-export type ValueKey = string | any[] | null
+export type ValueKey = string | any[]
 
-export type Key = ValueKey | (() => ValueKey)
+export type Key = ValueKey | (() => ValueKey | null)
 
 export type Fetcher<Data> = (...args: any[]) => Data | Promise<Data>
 
@@ -12,8 +12,9 @@ export interface PublicConfiguration {
 export type SWRConfiguration = Partial<PublicConfiguration>
 
 export type SWRResponse<Data, Error> = {
-  data?: Data,
-  error?: Error
+  data: Data | undefined,
+  error: Error | undefined,
+  isValidating: boolean
 }
 
 export type watchCallback<Data = any, Error = any> = (response: SWRResponse<Data, Error>) => any

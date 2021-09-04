@@ -1,49 +1,81 @@
-import { isFunction } from './helper'
-import { Fetcher, Key, SWRConfiguration, SWRObservable, SWRResponse, SWRWatcher, watchCallback } from './types'
+import { deepEqual, isFunction, noop } from './helper'
+import { Fetcher, Key, PublicConfiguration, SWRConfiguration, SWRObservable, SWRResponse, SWRWatcher, watchCallback } from './types'
+
+const defaultConfiguration: PublicConfiguration<any, any> = {
+  compare: deepEqual,
+  dedupingInterval: 2000,
+  fallbackData: undefined,
+  onSuccess: noop,
+  onError: noop,
+  shouldRetryOnError: true,
+  errorRetryInterval: 5000,
+  errorRetryCount: 5,
+  refreshInterval: 0
+}
 
 export class Observable<Data = any, Error = any> implements SWRObservable<Data, Error> {
   private _watchers: Watcher<Data, Error>[]
   private _keyIsFunction: boolean
   private _key: Key
   private _fetcher: Fetcher<Data>
-  private _options: SWRConfiguration
+  private _options: PublicConfiguration<Data, Error>
   private _data: Data | undefined = undefined
   private _error: Error | undefined = undefined
   private _isValidating = false
-  constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration) {
+  private _lastFetchTs = 0
+  private _errorRetryCounter = 0
+  constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>) {
     this._watchers = []
     this._key = key
     this._fetcher = fetcher
-    this._options = options
+    this._options = {...defaultConfiguration, ...options}
+    this._data = this._options.fallbackData
     this._keyIsFunction = isFunction(key)
+  }
+
+  private get response (): SWRResponse<Data, Error> {
+    return {
+      data: this._data,
+      error: this._error,
+      isValidating: this._isValidating
+    }
   }
 
   watch (fn: watchCallback<Data, Error>): SWRWatcher {
     const watcher = new Watcher(fn)
     this._watchers.push(watcher)
     this._callFetcher()
-    this._callWatchers()
+    if (typeof watcher._callback === 'function') {
+      watcher._callback(this.response)
+    }
     return watcher
   }
 
   private _callWatchers():void {
-    const response: SWRResponse<Data, Error> = {
-      data: this._data,
-      error: this._error,
-      isValidating: this._isValidating
-    }
-    for (const watcher of this._watchers) {
+    const removedIndices: number[] = []
+    for (const index in this._watchers) {
+      const watcher = this._watchers[index]
       if (typeof watcher._callback === 'function') {
         try {
-          watcher._callback(response)
+          watcher._callback(this.response)
         } catch (err) {
           // no-op
         }
+      } else {
+        removedIndices.push(parseInt(index))
       }
+    }
+    for (const index of removedIndices) {
+      this._watchers.splice(index, 1)
     }
   }
 
   private _callFetcher ():void {
+    const now = Date.now()
+    if ((now - this._lastFetchTs) < this._options.dedupingInterval) {
+      return
+    }
+    this._lastFetchTs = now
     let key: any = this._key
     if (this._keyIsFunction) {
       try {
@@ -58,32 +90,58 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
     if (key !== null) {
       try {
         this._isValidating = true
-        Promise.resolve(this._fetcher(...key)).then(data => {
+        Promise.resolve(this._fetcher.apply(this._fetcher, key)).then(data => {
+          const previousData = this._data
           this._data = data as Data
           this._error = undefined
-        }).catch(err => {
-          this._data = undefined
-          this._error = err as Error
-        }).finally(() => {
           this._isValidating = false
-          this._callWatchers()
-        })
+          const onSuccess = this._options.onSuccess
+          onSuccess.apply(onSuccess, [data, key[0], this._options])
+          if (!this._options.compare(previousData, data)) {
+            this._callWatchers()
+          }
+          this._lastFetchTs = 0
+          this._errorRetryCounter = 0
+        }).catch((err) => this._errorHandler(err, key[0]))
       } catch (err) {
-        this._data = undefined
-        this._error = err as Error
-        this._isValidating = false
+        this._errorHandler(err, key[0])
+      }
+    }
+  }
+
+  private _errorHandler (err: unknown, key: string) {
+    this._data = this._options.fallbackData
+    this._error = err as Error
+    this._isValidating = false
+    this._lastFetchTs = 0
+    const onError = this._options.onError
+    onError.apply(onError, [this._error, key, this._options])
+    this._callWatchers()
+    if (this._options.shouldRetryOnError && this._errorRetryCounter < this._options.errorRetryCount) {
+      if (this._options.onErrorRetry) {
+        const revalidateOptions = {
+          retryCount: this._errorRetryCounter++
+        }
+        this._options.onErrorRetry(this._error, key, this._options, this._callFetcher.bind(this), revalidateOptions)
+      } else {
+        // Exponential back-off
+        const timeout = ~~((Math.random() + 0.5) * (1 << Math.min(this._errorRetryCounter, 8))) * this._options.errorRetryInterval
+        setTimeout(() => {
+          this._errorRetryCounter++
+          this._callFetcher()
+        }, timeout)
       }
     }
   }
 }
 
 class Watcher<Data, Error> implements SWRWatcher {
-  _callback;
+  _callback: watchCallback<Data, Error> | null;
   constructor(fn: watchCallback<Data, Error>) {
     this._callback = fn
   }
 
   unwatch ():void {
-    // todo: unwatch handler
+    this._callback = null
   }
 }

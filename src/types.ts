@@ -5,11 +5,24 @@ export type Key = ValueKey | (() => ValueKey | null)
 
 export type Fetcher<Data> = (...args: any[]) => Data | Promise<Data>
 
-export interface PublicConfiguration {
-  loadingTimeout: number
+export type RevalidateOption = {
+  retryCount: number
 }
 
-export type SWRConfiguration = Partial<PublicConfiguration>
+export interface PublicConfiguration<Data = any, Error = any> {
+  compare: (a: Data | undefined, b: Data | undefined) => boolean
+  dedupingInterval: number
+  fallbackData: Data | undefined
+  onSuccess: (data: Data, key: string, config: Readonly<PublicConfiguration>) => any
+  onError: (err: Error, key: string, config: Readonly<PublicConfiguration>) => any
+  shouldRetryOnError: boolean
+  errorRetryInterval: number
+  errorRetryCount: number
+  onErrorRetry?: (err: Error, key: string, config: Readonly<PublicConfiguration>, revalidate: () => void, revalidateOpts: RevalidateOption) => any
+  refreshInterval: number
+}
+
+export type SWRConfiguration<Data, Error> = Partial<PublicConfiguration<Data, Error>>
 
 export type SWRResponse<Data, Error> = {
   data: Data | undefined,

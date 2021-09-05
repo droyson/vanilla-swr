@@ -10,7 +10,8 @@ const defaultConfiguration: PublicConfiguration<any, any> = {
   shouldRetryOnError: true,
   errorRetryInterval: 5000,
   errorRetryCount: 5,
-  refreshInterval: 0
+  refreshInterval: 0,
+  revalidateOnWatch: true
 }
 
 export class Observable<Data = any, Error = any> implements SWRObservable<Data, Error> {
@@ -44,7 +45,9 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   watch (fn: watchCallback<Data, Error>): SWRWatcher {
     const watcher = new Watcher(fn)
     this._watchers.push(watcher)
-    this._callFetcher()
+    if (this._options.revalidateOnWatch || this._data === undefined) {
+      this._callFetcher()
+    }
     if (typeof watcher._callback === 'function') {
       watcher._callback(this.response)
     }

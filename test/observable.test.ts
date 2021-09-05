@@ -1,4 +1,5 @@
 import { Observable } from '../src/observable'
+import { SWRConfiguration } from '../src/types'
 import { asyncNextTick } from './_testHelper'
 
 describe('observable', function () {
@@ -335,8 +336,27 @@ describe('observable', function () {
       })
     })
 
-    // describe('refresh', function () {
-    //   test('should call refresh ')
-    // })
+    describe('revalidation handling', function () {
+      test('should not revalidate on adding a watcher if revalidateOnWatch is set to false and value is defined', async () => {
+        jest.useFakeTimers('modern')
+        const customOptions: SWRConfiguration<any, any> = {
+          revalidateOnWatch: false
+        }
+
+        const observable = new Observable(key, fetcher, customOptions)
+        fetcher.mockRejectedValueOnce('fetcher failed').mockResolvedValue('fetcher resolved')
+        observable.watch(() => null)
+        await asyncNextTick()
+        await asyncNextTick()
+        observable.watch(() => null)
+        await asyncNextTick()
+        // will call revalidate if value is not defined
+        expect(fetcher).toBeCalledTimes(2)
+        jest.runOnlyPendingTimers()
+        await asyncNextTick()
+        observable.watch(() => null)
+        expect(fetcher).toBeCalledTimes(3)
+      })
+    })
   })
 })

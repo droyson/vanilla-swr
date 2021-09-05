@@ -48,6 +48,8 @@ declare module swr
 	    errorRetryInterval: number;
 	    errorRetryCount: number;
 	    onErrorRetry?: (err: Error, key: string, config: Readonly<PublicConfiguration>, revalidate: () => void, revalidateOpts: RevalidateOption) => any;
+	    refreshInterval: number;
+	    revalidateOnWatch: boolean;
 	}
 	export type SWRConfiguration<Data, Error> = Partial<PublicConfiguration<Data, Error>>;
 	export type SWRResponse<Data, Error> = {

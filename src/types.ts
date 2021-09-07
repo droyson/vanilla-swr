@@ -21,6 +21,8 @@ export interface PublicConfiguration<Data = any, Error = any> {
   onErrorRetry?: (err: Error, key: string, config: Readonly<PublicConfiguration>, revalidate: () => void, revalidateOpts: RevalidateOption) => any
   refreshInterval: number
   revalidateOnWatch: boolean
+  revalidateOnFocus: boolean
+  revalidateOnReconnect: boolean
 }
 
 export type SWRConfiguration<Data, Error> = Partial<PublicConfiguration<Data, Error>>

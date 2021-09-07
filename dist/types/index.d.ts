@@ -20,12 +20,17 @@ declare module swr
 	    private _isValidating;
 	    private _lastFetchTs;
 	    private _errorRetryCounter;
+	    private _online;
+	    private _timer;
 	    constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>);
 	    private get response();
 	    watch(fn: watchCallback<Data, Error>): SWRWatcher;
 	    private _callWatchers;
 	    private _callFetcher;
 	    private _errorHandler;
+	    private _isVisible;
+	    private _initFocus;
+	    private _initReconnect;
 	}
 
 	import { Fetcher, Key, SWRConfiguration, SWRObservable } from './types';
@@ -50,6 +55,8 @@ declare module swr
 	    onErrorRetry?: (err: Error, key: string, config: Readonly<PublicConfiguration>, revalidate: () => void, revalidateOpts: RevalidateOption) => any;
 	    refreshInterval: number;
 	    revalidateOnWatch: boolean;
+	    revalidateOnFocus: boolean;
+	    revalidateOnReconnect: boolean;
 	}
 	export type SWRConfiguration<Data, Error> = Partial<PublicConfiguration<Data, Error>>;
 	export type SWRResponse<Data, Error> = {

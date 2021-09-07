@@ -357,6 +357,95 @@ describe('observable', function () {
         observable.watch(() => null)
         expect(fetcher).toBeCalledTimes(3)
       })
+
+      test('should revalidate on focus', async () => {
+        const observable = new Observable(key, fetcher, options)
+        fetcher.mockResolvedValue('resolved value')
+        observable.watch(() => null)
+        expect(fetcher).toBeCalledTimes(1)
+        await asyncNextTick()
+        // revalidate on visibilitychange event
+        const visibilityStateSpy = jest.spyOn(document, 'visibilityState', 'get')
+        visibilityStateSpy.mockReturnValue('hidden')
+        document.dispatchEvent(new Event('visibilitychange'))
+        visibilityStateSpy.mockReturnValue('visible')
+        document.dispatchEvent(new Event('visibilitychange'))
+        expect(fetcher).toBeCalledTimes(2)
+        await asyncNextTick()
+        // revalidate on window focus change
+        visibilityStateSpy.mockReturnValue('hidden')
+        window.dispatchEvent(new Event('focus'))
+        visibilityStateSpy.mockReturnValue('visible')
+        window.dispatchEvent(new Event('focus'))
+        expect(fetcher).toBeCalledTimes(3)
+      })
+
+      test('should not revalidate on focus when revalidateOnFocus flag is set to false', async () => {
+        const customOptions: SWRConfiguration<any, any> = {
+          revalidateOnFocus: false
+        }
+        fetcher.mockResolvedValue('resolved value')
+        const observable = new Observable(key, fetcher, customOptions)
+        observable.watch(() => null)
+        expect(fetcher).toBeCalledTimes(1)
+        await asyncNextTick()
+        // revalidate on visibilitychange event
+        const visibilityStateSpy = jest.spyOn(document, 'visibilityState', 'get')
+        visibilityStateSpy.mockReturnValue('hidden')
+        document.dispatchEvent(new Event('visibilitychange'))
+        visibilityStateSpy.mockReturnValue('visible')
+        document.dispatchEvent(new Event('visibilitychange'))
+        expect(fetcher).toBeCalledTimes(1)
+        await asyncNextTick()
+        // revalidate on window focus change
+        visibilityStateSpy.mockReturnValue('hidden')
+        window.dispatchEvent(new Event('focus'))
+        visibilityStateSpy.mockReturnValue('visible')
+        window.dispatchEvent(new Event('focus'))
+        expect(fetcher).toBeCalledTimes(1)
+      })
+
+      test('should revalidate on reconnect', async () => {
+        const observable = new Observable(key, fetcher, options)
+        fetcher.mockResolvedValue('resolved value')
+        observable.watch(() => null)
+        expect(fetcher).toBeCalledTimes(1)
+        await asyncNextTick()
+        window.dispatchEvent(new Event('offline'))
+        window.dispatchEvent(new Event('online'))
+        expect(fetcher).toBeCalledTimes(2)
+      })
+
+      test('should not revalidate on reconnect when revalidateOnReconnect is set to false', async () => {
+        const customOptions: SWRConfiguration<any, any> = {
+          revalidateOnReconnect: false
+        }
+        const observable = new Observable(key, fetcher, customOptions)
+        fetcher.mockResolvedValue('resolved value')
+        observable.watch(() => null)
+        expect(fetcher).toBeCalledTimes(1)
+        await asyncNextTick()
+        window.dispatchEvent(new Event('offline'))
+        window.dispatchEvent(new Event('online'))
+        expect(fetcher).toBeCalledTimes(1)
+      })
+    })
+
+    describe('refresh handling', function () {
+      test('should poll fetcher when refreshInterval is specified', async () => {
+        jest.useFakeTimers('modern')
+        const customOptions: SWRConfiguration<any, any> = {
+          refreshInterval: 100
+        }
+        const observable = new Observable(key, fetcher, customOptions)
+        fetcher.mockResolvedValue('resolved value')
+        observable.watch(() => null)
+        await asyncNextTick()
+        expect(fetcher).toBeCalledTimes(1)
+        jest.runOnlyPendingTimers()
+        expect(fetcher).toBeCalledTimes(2)
+        await asyncNextTick()
+      })
     })
   })
 })

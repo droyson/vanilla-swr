@@ -11,7 +11,9 @@ const defaultConfiguration: PublicConfiguration<any, any> = {
   errorRetryInterval: 5000,
   errorRetryCount: 5,
   refreshInterval: 0,
-  revalidateOnWatch: true
+  revalidateOnWatch: true,
+  revalidateOnFocus: true,
+  revalidateOnReconnect: true
 }
 
 export class Observable<Data = any, Error = any> implements SWRObservable<Data, Error> {
@@ -25,6 +27,8 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   private _isValidating = false
   private _lastFetchTs = 0
   private _errorRetryCounter = 0
+  private _online = true
+  private _timer: any
   constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>) {
     this._watchers = []
     this._key = key
@@ -32,6 +36,13 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
     this._options = {...defaultConfiguration, ...options}
     this._data = this._options.fallbackData
     this._keyIsFunction = isFunction(key)
+    this._online = typeof navigator?.onLine === 'boolean' ? navigator.onLine : true
+    if (this._options.revalidateOnFocus) {
+      this._initFocus()
+    }
+    if (this._options.revalidateOnReconnect) {
+      this._initReconnect()
+    }
   }
 
   private get response (): SWRResponse<Data, Error> {
@@ -105,6 +116,11 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
           }
           this._lastFetchTs = 0
           this._errorRetryCounter = 0
+          if (this._options.refreshInterval > 0) {
+            this._timer = setTimeout(() => {
+              this._callFetcher()
+            }, this._options.refreshInterval)
+          }
         }).catch((err) => this._errorHandler(err, key[0]))
       } catch (err) {
         this._errorHandler(err, key[0])
@@ -134,6 +150,40 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
           this._callFetcher()
         }, timeout)
       }
+    }
+  }
+
+  private _isVisible (): boolean {
+    return document?.visibilityState !== 'hidden'
+  }
+
+  private _initFocus () {
+    if (typeof document?.addEventListener === 'function') {
+      document.addEventListener('visibilitychange', () => {
+        if (this._isVisible()) {
+          this._callFetcher()
+        }
+      })
+    }
+
+    if (typeof window?.addEventListener === 'function') {
+      window.addEventListener('focus', () => {
+        if (this._isVisible()) {
+          this._callFetcher()
+        }
+      })
+    }
+  }
+
+  private _initReconnect () {
+    if (typeof window?.addEventListener === 'function') {
+      window.addEventListener('online', () => {
+        this._online = true
+        this._callFetcher()
+      })
+      window.addEventListener('offline', () => {
+        this._online = false
+      })
     }
   }
 }

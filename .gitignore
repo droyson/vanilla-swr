@@ -1,3 +1,4 @@
+# cSpell:disable
 # Logs
 logs
 *.log
@@ -101,3 +102,4 @@ typings/
 
 # TernJS port file
 .tern-port
+.vscode

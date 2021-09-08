@@ -1,12 +1,15 @@
 {
-  "name": "js-library-boilerplate",
+  "name": "vanilla-swr",
   "version": "1.0.0",
-  "description": "Boilerplate code for setting up a JS library",
+  "description": "`stale-while-revalidate` caching strategy for vanilla web-apps ",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/droyson/js-library-boilerplate"
+    "url": "https://github.com/droyson/vanilla-swr"
   },
   "author": "Royson <roysondsilva@gmail.com>",
   "license": "MIT",
@@ -14,7 +17,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js --mode production",
     "test": "jest",
-    "lint": "eslint . --ext .js,.ts"
+    "lint": "eslint . --ext .js,.ts --fix"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

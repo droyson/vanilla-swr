@@ -23,6 +23,8 @@ export interface PublicConfiguration<Data = any, Error = any> {
   revalidateOnWatch: boolean
   revalidateOnFocus: boolean
   revalidateOnReconnect: boolean
+  refreshWhenHidden: boolean
+  refreshWhenOffline: boolean
 }
 
 export type SWRConfiguration<Data, Error> = Partial<PublicConfiguration<Data, Error>>

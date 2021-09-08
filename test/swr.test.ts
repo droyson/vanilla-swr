@@ -38,4 +38,10 @@ describe('swrHandler', function () {
     expect(observable1).toBe(observable2)
     expect(observable3).not.toBe(observable1)
   })
+
+  test('should provide empty object when options is not provided', () => {
+    const noOptionKey = 'no options key'
+    swrHandler(noOptionKey, fetcher)
+    expect(mockedObservable).toHaveBeenLastCalledWith(noOptionKey, fetcher, expect.objectContaining({}))
+  })
 })

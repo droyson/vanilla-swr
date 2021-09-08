@@ -13,7 +13,9 @@ const defaultConfiguration: PublicConfiguration<any, any> = {
   refreshInterval: 0,
   revalidateOnWatch: true,
   revalidateOnFocus: true,
-  revalidateOnReconnect: true
+  revalidateOnReconnect: true,
+  refreshWhenHidden: false,
+  refreshWhenOffline: false
 }
 
 export class Observable<Data = any, Error = any> implements SWRObservable<Data, Error> {
@@ -59,8 +61,10 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
     if (this._options.revalidateOnWatch || this._data === undefined) {
       this._callFetcher()
     }
-    if (typeof watcher._callback === 'function') {
-      watcher._callback(this.response)
+    try {
+      fn(this.response)
+    } catch (err) {
+      // no-op
     }
     return watcher
   }
@@ -162,6 +166,8 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       document.addEventListener('visibilitychange', () => {
         if (this._isVisible()) {
           this._callFetcher()
+        } else if (this._timer && !this._options.refreshWhenHidden) {
+          clearTimeout(this._timer)
         }
       })
     }
@@ -170,6 +176,8 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       window.addEventListener('focus', () => {
         if (this._isVisible()) {
           this._callFetcher()
+        } else if (this._timer && !this._options.refreshWhenHidden) {
+          clearTimeout(this._timer)
         }
       })
     }
@@ -183,6 +191,9 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       })
       window.addEventListener('offline', () => {
         this._online = false
+        if (this._timer && !this._options.refreshWhenOffline) {
+          clearTimeout(this._timer)
+        }
       })
     }
   }

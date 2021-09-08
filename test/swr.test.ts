@@ -30,6 +30,14 @@ describe('swrHandler', function () {
     expect(observable3).not.toBe(observable1)
   })
 
+  test('should return same observable for same array key', () => {
+    const observable1 = swrHandler([key, 'param 1'], fetcher, options)
+    const observable2 = swrHandler([key, 'param 1'], fetcher, options)
+    const observable3 = swrHandler([key, 'param 2'], fetcher, options)
+    expect(observable1).toBe(observable2)
+    expect(observable3).not.toBe(observable1)
+  })
+
   test('should return same observable for same function key', () => {
     const keyFn = () => key
     const observable1 = swrHandler(keyFn, fetcher, options)

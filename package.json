@@ -17,7 +17,9 @@
   "scripts": {
     "build": "webpack --config webpack.config.js --mode production",
     "test": "jest",
-    "lint": "eslint . --ext .js,.ts --fix"
+    "lint": "eslint . --ext .js,.ts --fix",
+    "preversion": "yarn lint && yarn test && yarn build",
+    "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\""
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

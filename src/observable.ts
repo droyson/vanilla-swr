@@ -18,12 +18,17 @@ const defaultConfiguration: PublicConfiguration<any, any> = {
   refreshWhenOffline: false
 }
 
+const VISIBILITY_CHANGE = 'visibilitychange'
+const FOCUS = 'focus'
+const ONLINE = 'online'
+const OFFLINE = 'offline'
+
 export class Observable<Data = any, Error = any> implements SWRObservable<Data, Error> {
   private _watchers: Watcher<Data, Error>[]
   private _keyIsFunction: boolean
   private _key: Key
   private _fetcher: Fetcher<Data>
-  private _options: PublicConfiguration<Data, Error>
+  private _options: PublicConfiguration<Data, Error> = defaultConfiguration
   private _data: Data | undefined = undefined
   private _error: Error | undefined = undefined
   private _isValidating = false
@@ -31,20 +36,14 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   private _errorRetryCounter = 0
   private _online = true
   private _timer: any
+  private _listeners: Record<string, EventListenerOrEventListenerObject> = {}
   constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>) {
     this._watchers = []
     this._key = key
     this._fetcher = fetcher
-    this._options = {...defaultConfiguration, ...options}
-    this._data = this._options.fallbackData
     this._keyIsFunction = isFunction(key)
     this._online = typeof navigator?.onLine === 'boolean' ? navigator.onLine : true
-    if (this._options.revalidateOnFocus) {
-      this._initFocus()
-    }
-    if (this._options.revalidateOnReconnect) {
-      this._initReconnect()
-    }
+    this._setOptions(options)
   }
 
   private get response (): SWRResponse<Data, Error> {
@@ -52,6 +51,23 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       data: this._data,
       error: this._error,
       isValidating: this._isValidating
+    }
+  }
+
+  private _setOptions (options: SWRConfiguration<Data, Error>) {
+    this._options = {...defaultConfiguration, ...options}
+    if (typeof this._data === 'undefined') {
+      this._data = this._options.fallbackData
+    }
+    if (this._options.revalidateOnFocus) {
+      this._initFocus()
+    } else {
+      this._clearFocus()
+    }
+    if (this._options.revalidateOnReconnect) {
+      this._initReconnect()
+    } else {
+      this._clearReconnect()
     }
   }
 
@@ -67,6 +83,13 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       // no-op
     }
     return watcher
+  }
+
+  mutate (options?: SWRConfiguration<Data, Error>): void {
+    if (typeof options !== 'undefined') {
+      this._setOptions(options)
+    }
+    this._callFetcher()
   }
 
   private _callWatchers():void {
@@ -161,40 +184,60 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
     return document?.visibilityState !== 'hidden'
   }
 
+  private _visibilityListener () {
+    if (this._isVisible()) {
+      this._callFetcher()
+    } else if (this._timer && !this._options.refreshWhenHidden) {
+      clearTimeout(this._timer)
+    }
+  }
+
+  private _onlineListener () {
+    this._online = true
+    this._callFetcher()
+  }
+
+  private _offlineListener () {
+    this._online = false
+    if (this._timer && !this._options.refreshWhenOffline) {
+      clearTimeout(this._timer)
+    }
+  }
+
   private _initFocus () {
+    this._listeners.focus = this._visibilityListener.bind(this)
     if (typeof document?.addEventListener === 'function') {
-      document.addEventListener('visibilitychange', () => {
-        if (this._isVisible()) {
-          this._callFetcher()
-        } else if (this._timer && !this._options.refreshWhenHidden) {
-          clearTimeout(this._timer)
-        }
-      })
+      document.addEventListener(VISIBILITY_CHANGE, this._listeners.focus)
     }
 
     if (typeof window?.addEventListener === 'function') {
-      window.addEventListener('focus', () => {
-        if (this._isVisible()) {
-          this._callFetcher()
-        } else if (this._timer && !this._options.refreshWhenHidden) {
-          clearTimeout(this._timer)
-        }
-      })
+      window.addEventListener(FOCUS, this._listeners.focus)
     }
   }
 
   private _initReconnect () {
+    this._listeners.online = this._onlineListener.bind(this)
+    this._listeners.offline = this._offlineListener.bind(this)
     if (typeof window?.addEventListener === 'function') {
-      window.addEventListener('online', () => {
-        this._online = true
-        this._callFetcher()
-      })
-      window.addEventListener('offline', () => {
-        this._online = false
-        if (this._timer && !this._options.refreshWhenOffline) {
-          clearTimeout(this._timer)
-        }
-      })
+      window.addEventListener(ONLINE, this._listeners.online)
+      window.addEventListener(OFFLINE, this._listeners.offline)
+    }
+  }
+
+  private _clearFocus () {
+    if (typeof document?.removeEventListener === 'function') {
+      document.removeEventListener(VISIBILITY_CHANGE, this._listeners.focus)
+    }
+    if (typeof window?.removeEventListener === 'function') {
+      document.removeEventListener(FOCUS, this._listeners.focus)
+    }
+    delete this._listeners.focus
+  }
+
+  private _clearReconnect () {
+    if (typeof window?.removeEventListener === 'function') {
+      window.removeEventListener(ONLINE, this._listeners.online)
+      window.removeEventListener(OFFLINE, this._listeners.offline)
     }
   }
 }

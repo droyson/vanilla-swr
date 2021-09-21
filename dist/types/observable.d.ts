@@ -12,13 +12,21 @@ export declare class Observable<Data = any, Error = any> implements SWRObservabl
     private _errorRetryCounter;
     private _online;
     private _timer;
+    private _listeners;
     constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>);
     private get response();
+    private _setOptions;
     watch(fn: watchCallback<Data, Error>): SWRWatcher;
+    mutate(options?: SWRConfiguration<Data, Error>): void;
     private _callWatchers;
     private _callFetcher;
     private _errorHandler;
     private _isVisible;
+    private _visibilityListener;
+    private _onlineListener;
+    private _offlineListener;
     private _initFocus;
     private _initReconnect;
+    private _clearFocus;
+    private _clearReconnect;
 }

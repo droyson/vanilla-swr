@@ -533,4 +533,58 @@ describe('observable', function () {
       })
     })
   })
+
+  describe('mutate', function () {
+    test('should fetch values again and update the watcher when mutate is called', async () => {
+      const observable = new Observable(key, fetcher, options)
+      fetcher.mockResolvedValue('value 1')
+      const watchCb1 = jest.fn()
+      const watchCb2 = jest.fn()
+      observable.watch(watchCb1)
+      observable.watch(watchCb2)
+      await asyncNextTick()
+      expect(fetcher).toHaveBeenCalledTimes(1)
+      expect(watchCb1).toHaveBeenCalledTimes(2)
+      expect(watchCb2).toHaveBeenCalledTimes(2)
+      fetcher.mockResolvedValue('value 2')
+      observable.mutate()
+      await asyncNextTick()
+      expect(fetcher).toHaveBeenCalledTimes(2)
+      expect(watchCb1).toHaveBeenCalledTimes(3)
+      expect(watchCb2).toHaveBeenCalledTimes(3)
+      expect(watchCb1).toHaveBeenLastCalledWith(expect.objectContaining({
+        data: 'value 2',
+        error: undefined,
+        isValidating: false
+      }))
+    })
+
+    test('should fetch values again with updated options when mutate is called', async () => {
+      const observable = new Observable(key, fetcher, options)
+      fetcher.mockResolvedValue('value 1')
+      const watchCb1 = jest.fn()
+      const watchCb2 = jest.fn()
+      observable.watch(watchCb1)
+      observable.watch(watchCb2)
+      await asyncNextTick()
+      expect(fetcher).toHaveBeenCalledTimes(1)
+      expect(watchCb1).toHaveBeenCalledTimes(2)
+      expect(watchCb2).toHaveBeenCalledTimes(2)
+      fetcher.mockResolvedValue('value 2')
+      const newOptions: SWRConfiguration<any, any> = {
+        onSuccess: jest.fn()
+      }
+      observable.mutate(newOptions)
+      await asyncNextTick()
+      expect(fetcher).toHaveBeenCalledTimes(2)
+      expect(watchCb1).toHaveBeenCalledTimes(3)
+      expect(watchCb2).toHaveBeenCalledTimes(3)
+      expect(watchCb1).toHaveBeenLastCalledWith(expect.objectContaining({
+        data: 'value 2',
+        error: undefined,
+        isValidating: false
+      }))
+      expect(newOptions.onSuccess).toHaveBeenLastCalledWith('value 2', key, expect.objectContaining(newOptions))
+    })
+  })
 })

@@ -17,6 +17,12 @@ module.exports = {
   },
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    library: {
+      name: 'SWR',
+      type: 'umd2',
+      export: 'default',
+      umdNamedDefine: true
+    }
   }
 }

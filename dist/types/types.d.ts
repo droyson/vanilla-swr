@@ -33,6 +33,7 @@ export interface SWRWatcher {
 }
 export interface SWRObservable<Data = any, Error = any> {
     watch(fn: watchCallback<Data, Error>): SWRWatcher;
+    mutate(options?: SWRConfiguration<Data, Error>): void;
 }
 export declare type Cache<Data = any> = {
     get(key: Key): Data | null | undefined;

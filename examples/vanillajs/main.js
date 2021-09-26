@@ -181,7 +181,7 @@ const clock2 = new Clock2()
 
 !(function (clocks) {
   async function initRegionPicker () {
-    const timezones = await fetch('http://worldtimeapi.org/api/timezone').then(res => res.json())
+    const timezones = await fetch(`${location.protocol}//worldtimeapi.org/api/timezone`).then(res => res.json())
     const regionPicker = document.getElementById('region-picker')
     
     for (const timezone of timezones) {
@@ -214,7 +214,7 @@ const clock2 = new Clock2()
   initRegionPicker()
 
   async function fetchTime (region) {
-    const { datetime } = await fetch(`http://worldtimeapi.org/api/timezone/${region}`).then(res => res.json())
+    const { datetime } = await fetch(`${location.protocol}//worldtimeapi.org/api/timezone/${region}`).then(res => res.json())
     const tzIndex = datetime.search(/(-|\+)\d{2}:\d{2}/)
     return new Date(datetime.substring(0, tzIndex))
   }

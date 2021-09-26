@@ -55,6 +55,7 @@ watcher.unwatch()
 * `watch`: receives a callback that is called with resolved value or rejected error of fetcher. Returns [Watcher](#SWRWatcher).
   
   Multiple watchers can be added to same observable.
+* `mutate(options?)`: call mutate to manually trigger a revalidate. Optionally receives options to update the existing [SWRConfiguration](#SWRConfiguration).
 
 ### SWRWatcher:
 * `unwatch`: removes the watcher from the observable.

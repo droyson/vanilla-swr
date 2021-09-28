@@ -1,0 +1,51 @@
+header {
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: aliceblue;
+  box-shadow: 0 2px 4px 0px #0000004d;
+}
+header > h1 {
+  margin: 0px;
+}
+main {
+  margin: 32px;
+}
+main span {
+  margin-right: 8px;
+}
+.clocks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.clocks > div+div {
+  margin-left: 32px;
+}
+.picker-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.picker-container > div+div {
+  margin-left: 32px;
+}
+
+@media screen and (max-width: 640px) {
+  .clocks {
+    flex-direction: column;
+  }
+  .clocks > div+div {
+    margin-left: 0px;
+    margin-top: 32px;
+  }
+  .picker-container {
+    flex-direction: column;
+  }
+  .picker-container > div+div {
+    margin-left: 0px;
+    margin-top: 24px;
+  }
+}

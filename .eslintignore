@@ -2,3 +2,4 @@ node_modules
 dist
 jest.config.js
 webpack.config.js
+examples

@@ -1,0 +1,20 @@
+:root {
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+  color: #1e1842;
+}
+
+html,body {
+  padding: 0px;
+  margin: 0px;
+}
+
+body {
+  margin: 0;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

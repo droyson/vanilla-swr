@@ -1,7 +1,7 @@
 import SWR from './swr'
 export default SWR
 
-export {
+export type {
   Key,
   Fetcher,
   SWRConfiguration,

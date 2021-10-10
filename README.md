@@ -141,3 +141,9 @@ const observable = SWR('/api/data', fetcher, {
   }
 })
 ```
+## Demo
+Below are examples using SWR in vanilla JS and other popular frameworks.
+
+* Vanilla JS - [Code](./examples/vanillajs)
+* React JS - [Code](./examples/reactjs)
+* Vue JS (Vue 3) - [Code](./exmaples/vuejs)

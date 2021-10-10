@@ -1,8 +1,12 @@
 {
   "name": "vanilla-swr",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "`stale-while-revalidate` caching strategy for vanilla web-apps ",
-  "keywords": ["swr", "vanilla-swr", "stale-while-revalidate"],
+  "keywords": [
+    "swr",
+    "vanilla-swr",
+    "stale-while-revalidate"
+  ],
   "browser": "./dist/index.js",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",

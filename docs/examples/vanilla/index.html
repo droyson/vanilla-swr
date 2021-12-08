@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    :root {
+      font-size: 16px;
+    }
+    * {
+      box-sizing: border-box;
+      color: #1e1842;
+    }
+    html,body {
+      padding: 0px;
+      margin: 0px;
+    }
+    header {
+      height: 64px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: aliceblue;
+      box-shadow: 0 2px 4px 0px #0000004d;
+    }
+    header > h1 {
+      margin: 0px;
+    }
+    main {
+      margin: 32px;
+    }
+    main span {
+      margin-right: 8px;
+    }
+    .picker-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+    .picker-container > div+div {
+      margin-left: 32px;
+    }
+    .clocks {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .clocks > div+div {
+      margin-left: 32px;
+    }
+    #clock-face-1 {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-family: sans-serif;
+    }
+    #time-1 {
+      color: blue;
+    }
+    #date-1 {
+      color: green;
+    }
+    @media screen and (max-width: 640px) {
+      .clocks {
+        flex-direction: column;
+      }
+      .clocks > div+div {
+        margin-left: 0px;
+        margin-top: 32px;
+      }
+      .picker-container {
+        flex-direction: column;
+      }
+      .picker-container > div+div {
+        margin-left: 0px;
+        margin-top: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vanilla Clock App</h1>
+  </header>
+  <main>
+    <div class="picker-container">
+      <div>
+        <span>Region: </span>
+        <select name="region-picker" id="region-picker"></select>
+      </div>
+      <div>
+        <input type="checkbox" name="only-api" id="api">
+        <label for="api">Update only via API</label>
+      </div>
+    </div>
+    <div class="clocks">
+      <div id="clock-face-1">
+        <span id="time-1"></span>
+        <span id="date-1"></span>
+      </div>
+      <div id="clock-face-2">
+        <canvas id="analog-canvas" width="200" height="200"></canvas>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-swr@1/dist/index.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>

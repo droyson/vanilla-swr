@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: 'Vanilla SWR',
+      repo: 'https://github.com/droyson/vanilla-swr',
+      maxLevel: 3,
+      plugins: [
+        function (hook) {
+          hook.beforeEach(function (content) {
+            return content.replace(/\$locationOrigin\$/g, window.location.origin)
+          })
+        }
+      ]
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script data-goatcounter="https://vanilla-swr.goatcounter.com/count" async src="./goat-counter.js"></script>
+</body>
+</html>

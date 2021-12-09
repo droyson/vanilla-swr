@@ -28,13 +28,13 @@ OR
 #### jsDelivr
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/vanilla-swr@1.0.2/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-swr/dist/index.min.js"></script>
 ```
 
 #### unpkg
 
 ```html
-<script src="https://unpkg.com/vanilla-swr@1.0.2/dist/index.js"></script>
+<script src="https://unpkg.com/vanilla-swr/dist/index.js"></script>
 ```
 
 `SWR` variable is present in the window object.

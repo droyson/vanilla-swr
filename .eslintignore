@@ -3,3 +3,5 @@ dist
 jest.config.js
 webpack.config.js
 examples
+docs/goat-counter.js
+docs/examples

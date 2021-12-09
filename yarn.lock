@@ -3357,11 +3357,6 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-types-webpack-bundler@^1.0.0:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/types-webpack-bundler/-/types-webpack-bundler-1.0.2.tgz#494ef8221ac0ba18092e9c4ec6321d56811cc9e2"
-  integrity sha512-McBxKu99h2WTyOl76SMcS5T3vKTsxBQxe5BQwrbcrFwnczQkU7ae6RKmUN/mqIYOIo4LnIowxFJY0XjPKurP/A==
-
 typescript@^4.3.5:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.2.tgz#6d618640d430e3569a1dfb44f7d7e600ced3ee86"

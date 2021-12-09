@@ -24,15 +24,9 @@
     "build": "webpack --config webpack.config.js --mode production",
     "test": "jest",
     "lint": "eslint . --ext .js,.ts --fix",
-    "preversion": "yarn lint && yarn test && yarn build",
+    "preversion": "yarn lint && yarn test && yarn build && yarn deploy:examples",
     "postversion": "git push --tags && yarn publish --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
-    "build:examples:react": "cd examples/reactjs && yarn && yarn build && cd ../../",
-    "build:examples:vue": "cd examples/vuejs && yarn && yarn build && cd ../../",
-    "build:examples": "yarn build:examples:react && yarn build:examples:vue",
-    "deploy:examples:react": "mkdir -p docs/examples/react && rm -rf docs/examples/react/* && mv examples/reactjs/build/* docs/examples/react",
-    "deploy:examples:vue": "mkdir -p docs/examples/vue && rm -rf docs/examples/vue/* && mv examples/vuejs/dist/* docs/examples/vue",
-    "deploy:examples:vanilla": "mkdir -p docs/examples/vanilla && cp -f examples/vanillajs/* docs/examples/vanilla",
-    "deploy:examples": "yarn build:examples && yarn deploy:examples:react && yarn deploy:examples:vue && yarn deploy:examples:vanilla"
+    "deploy:examples": "./deploy-examples.sh"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

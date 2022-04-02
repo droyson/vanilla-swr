@@ -43,7 +43,8 @@ export interface SWRWatcher {
 
 export interface SWRObservable<Data = any, Error = any> {
   watch(fn: watchCallback<Data, Error>):SWRWatcher;
-  mutate(options?: SWRConfiguration<Data, Error>):void
+  mutate(options?: SWRConfiguration<Data, Error>):void;
+  setFetcher(fetcher: Fetcher<Data>, override?: boolean): void
 }
 
 export type Cache<Data = any> = {

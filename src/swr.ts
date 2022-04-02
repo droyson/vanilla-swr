@@ -14,15 +14,15 @@ const normalizeKey = (key: Key): string => {
   return ''
 }
 
-const swrHandler = <Data = any, Error = any>(key: Key, fetcher: Fetcher<Data>, options?: SWRConfiguration<Data, Error>): SWRObservable<Data, Error> => {
+const swrHandler = <Data = any, Error = any>(key: Key, fetcher?: Fetcher<Data>, options?: SWRConfiguration<Data, Error>): SWRObservable<Data, Error> => {
   const normalizedKey = normalizeKey(key)
   let observable = cache.get(normalizedKey)
   if (!isObservable(observable)) {
-    if (typeof options === 'undefined') {
-      options = {}
-    }
     observable = new Observable(key, fetcher, options)
     cache.set(normalizedKey, observable)
+  } else if (fetcher) {
+    // set fetcher if not already set
+    observable.setFetcher(fetcher)
   }
   
   return observable

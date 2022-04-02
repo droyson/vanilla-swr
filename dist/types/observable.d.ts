@@ -13,9 +13,10 @@ export declare class Observable<Data = any, Error = any> implements SWRObservabl
     private _online;
     private _timer;
     private _listeners;
-    constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>);
+    constructor(key: Key, fetcher?: Fetcher<Data>, options?: SWRConfiguration<Data, Error>);
     private get response();
     private _setOptions;
+    setFetcher(fetcher: Fetcher<Data>, override?: boolean): void;
     watch(fn: watchCallback<Data, Error>): SWRWatcher;
     mutate(options?: SWRConfiguration<Data, Error>): void;
     private _callWatchers;

@@ -587,4 +587,75 @@ describe('observable', function () {
       expect(newOptions.onSuccess).toHaveBeenLastCalledWith('value 2', key, expect.objectContaining(newOptions))
     })
   })
+
+  describe('setting fetcher', function () {
+    test('should return Observable when fetcher is not passed', () => {
+      const observable = new Observable(key)
+      expect('watch' in observable).toBeTruthy()
+    })
+
+    test('should not throw when watch is called and fetcher is present', () => {
+      const observable = new Observable(key)
+      const watchCb1 = jest.fn()
+      try {
+        observable.watch(watchCb1)
+      } catch (err) {
+        console.log('threw an error', err)
+        throw err
+      }
+
+      expect(watchCb1).toBeCalledWith(expect.objectContaining({
+        data: undefined,
+        error: undefined,
+        isValidating: false
+      }))
+    })
+
+    test('should call watcher with resolved value from fetcher once it is set and mutate is called', async () => {
+      const observable = new Observable(key)
+      const watchCb1 = jest.fn()
+      observable.watch(watchCb1)
+      fetcher.mockReturnValueOnce('data 1')
+      observable.setFetcher(fetcher)
+      observable.mutate()
+      await asyncNextTick()
+      expect(watchCb1).toHaveBeenLastCalledWith(expect.objectContaining({
+        data: 'data 1',
+        error: undefined,
+        isValidating: false
+      }))
+    })
+
+    describe('updating fetcher', function () {
+      test('should not override fetcher when override flag is not passed', async () => {
+        fetcher.mockReturnValueOnce('fetcher 1 data')
+        const observable = new Observable(key, fetcher)
+        const fetcher2 = jest.fn().mockReturnValueOnce('fetcher 2 data')
+        observable.setFetcher(fetcher2)
+        const watchCb = jest.fn()
+        observable.watch(watchCb)
+        await asyncNextTick()
+        expect(watchCb).toHaveBeenLastCalledWith(expect.objectContaining({
+          data: 'fetcher 1 data',
+          error: undefined,
+          isValidating: false
+        }))
+      })
+
+      test('should override fetcher when override flag is true', async () => {
+        fetcher.mockReturnValueOnce('fetcher 1 data')
+        const observable = new Observable(key, fetcher)
+        const fetcher2 = jest.fn().mockReturnValueOnce('fetcher 2 data')
+        observable.setFetcher(fetcher2, true)
+        const watchCb = jest.fn()
+        observable.watch(watchCb)
+        await asyncNextTick()
+        expect(watchCb).toHaveBeenLastCalledWith(expect.objectContaining({
+          data: 'fetcher 2 data',
+          error: undefined,
+          isValidating: false
+        }))
+      })
+    })
+  })
 })

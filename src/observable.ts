@@ -27,7 +27,7 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   private _watchers: Watcher<Data, Error>[]
   private _keyIsFunction: boolean
   private _key: Key
-  private _fetcher: Fetcher<Data>
+  private _fetcher: Fetcher<Data> | undefined
   private _options: PublicConfiguration<Data, Error> = defaultConfiguration
   private _data: Data | undefined = undefined
   private _error: Error | undefined = undefined
@@ -37,7 +37,7 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   private _online = true
   private _timer: any
   private _listeners: Record<string, EventListenerOrEventListenerObject> = {}
-  constructor(key: Key, fetcher: Fetcher<Data>, options: SWRConfiguration<Data, Error>) {
+  constructor(key: Key, fetcher?: Fetcher<Data>, options?: SWRConfiguration<Data, Error>) {
     this._watchers = []
     this._key = key
     this._fetcher = fetcher
@@ -54,7 +54,7 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
     }
   }
 
-  private _setOptions (options: SWRConfiguration<Data, Error>) {
+  private _setOptions (options?: SWRConfiguration<Data, Error>) {
     this._options = {...defaultConfiguration, ...options}
     if (typeof this._data === 'undefined') {
       this._data = this._options.fallbackData
@@ -68,6 +68,12 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
       this._initReconnect()
     } else {
       this._clearReconnect()
+    }
+  }
+
+  setFetcher (fetcher: Fetcher<Data>, override = false): void {
+    if (!this._fetcher || override) {
+      this._fetcher = fetcher
     }
   }
 
@@ -112,6 +118,9 @@ export class Observable<Data = any, Error = any> implements SWRObservable<Data, 
   }
 
   private _callFetcher ():void {
+    if (!this._fetcher) {
+      return
+    }
     const now = Date.now()
     if ((now - this._lastFetchTs) < this._options.dedupingInterval) {
       return

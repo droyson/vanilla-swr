@@ -16,6 +16,10 @@ describe('swrHandler', function () {
     mockedObservable = mocked(Observable)
   })
 
+  afterEach(() => {
+    mockedObservable.mockClear()
+  })
+
   test('should accept key, fetcher and options and return SWRObservable', () => {
     const observable = swrHandler(key, fetcher, options)
     expect(mockedObservable).toHaveBeenCalledTimes(1)
@@ -50,6 +54,16 @@ describe('swrHandler', function () {
   test('should provide empty object when options is not provided', () => {
     const noOptionKey = 'no options key'
     swrHandler(noOptionKey, fetcher)
-    expect(mockedObservable).toHaveBeenLastCalledWith(noOptionKey, fetcher, expect.objectContaining({}))
+    expect(mockedObservable).toHaveBeenLastCalledWith(noOptionKey, fetcher, undefined)
+  })
+
+  describe('when no fetcher is provided while initialising', function () {
+    const key = 'no-initial-fetcher'
+    test('should return the same observable when key is same and fetcher is provided second time', () => {
+      const observable1 = swrHandler(key)
+      const observable2 = swrHandler(key, fetcher)
+      expect(observable2).toBe(observable1)
+      expect(mockedObservable.mock.instances[0].setFetcher).toHaveBeenLastCalledWith(fetcher)
+    })
   })
 })

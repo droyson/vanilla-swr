@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>Vanilla-SWR | Docs</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
 </head>
+
 <body>
   <div id="app"></div>
   <script>
@@ -20,6 +22,28 @@
           hook.beforeEach(function (content) {
             return content.replace(/\$locationOrigin\$/g, window.location.origin)
           })
+
+          hook.ready(function () {
+            function trackLink(text) {
+              let codeATags = document.evaluate(`//a[text()="${text}"]`, document, null, XPathResult.ANY_TYPE, null)
+              let aTag;
+              aTag = codeATags.iterateNext();
+              while (aTag) {
+                const textContent = aTag.parentNode.textContent;
+                aTag.onclick = function () {
+                  window.goatcounter.count({
+                    path: `${text}-viewed-${textContent}`,
+                    title: textContent,
+                    event: true
+                  })
+                }
+                aTag = codeATags.iterateNext()
+              }
+            }
+
+            trackLink('Code');
+            trackLink('Demo');
+          })
         }
       ]
     }
@@ -29,4 +53,5 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
   <script data-goatcounter="https://vanilla-swr.goatcounter.com/count" async src="./goat-counter.js"></script>
 </body>
+
 </html>

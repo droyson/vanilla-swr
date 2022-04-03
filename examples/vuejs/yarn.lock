@@ -9360,10 +9360,8 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
 
-vanilla-swr@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/vanilla-swr/-/vanilla-swr-1.0.1.tgz#0ac6589d10ac80e7b68ca37e879bdedf09adcc4a"
-  integrity sha512-/MzuoYASjHhWTXFy9oQl0yFXWddux57QdD3K8EPovcmc61iagucHOubQW0Dus7qpXcrPD/BvqXL/wlAYNVJt3Q==
+"vanilla-swr@file:../..":
+  version "1.0.3"
 
 vary@~1.1.2:
   version "1.1.2"

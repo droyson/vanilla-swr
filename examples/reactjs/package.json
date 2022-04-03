@@ -9,7 +9,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "vanilla-swr": "^1.0.1",
+    "vanilla-swr": "file:../../",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

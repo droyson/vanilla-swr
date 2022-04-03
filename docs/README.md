@@ -72,7 +72,7 @@ watcher.unwatch()
 ### Parameters
 
 - `key`: a unique key string for the request (or a function / array ). [(details)](#Arguments)
-- `fetcher`: a Promise returning function to fetch your data
+- `fetcher`: (optional) a Promise returning function to fetch your data. This can be set later by calling `setFetcher` method.
 - `options`: (optional) an object of options for this SWR
 
 ### SWRObservable
@@ -82,6 +82,8 @@ watcher.unwatch()
   Multiple watchers can be added to same observable.
 
 - `mutate(options?)`: call mutate to manually trigger a revalidate. Optionally receives options to update the existing [SWRConfiguration](#SWRConfiguration).
+
+- `setFetcher(fetcher, override?)`: set the fetcher for the given Observable. If a fetcher is already set to an observable this function will do nothing unless `override` flag is set to true.
 
 ### SWRWatcher
 

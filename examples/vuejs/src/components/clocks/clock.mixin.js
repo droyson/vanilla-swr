@@ -1,5 +1,5 @@
 import SWR from 'vanilla-swr'
-import { fetchTime } from '../../constants'
+// import { fetchTime } from '../../constants'
 
 export default {
   props: {
@@ -19,7 +19,7 @@ export default {
     }
   },
   created () {
-    const observable = SWR(this.getRegion, fetchTime)
+    const observable = SWR(this.getRegion)
     this.watcher = observable.watch(({ data }) => {
       this.dateTime = data
     })

@@ -1,7 +1,7 @@
 {
   "name": "vanilla-swr",
   "version": "1.1.0",
-  "description": "`stale-while-revalidate` caching strategy for vanilla web-apps ",
+  "description": "`stale-while-revalidate` caching strategy for vanilla web-apps",
   "keywords": [
     "swr",
     "vanilla-swr",
